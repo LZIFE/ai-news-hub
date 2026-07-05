@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@layer base {
+  body {
+    @apply bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors duration-200;
+  }
+
+  ::selection {
+    @apply bg-accent/20 text-accent dark:bg-accent-dark/20 dark:text-accent-dark;
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto max-w-site px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    @apply border border-light-border dark:border-dark-border p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  .badge {
+    @apply inline-block px-2.5 py-0.5 text-xs font-medium border border-light-border dark:border-dark-border;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white px-5 py-2.5 font-medium hover:bg-accent/90 transition-colors;
+  }
+
+  .input-search {
+    @apply w-full border border-light-border dark:border-dark-border bg-transparent px-4 py-2.5 outline-none focus:border-accent dark:focus:border-accent-dark transition-colors;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-light-border dark:bg-dark-border;
+}
