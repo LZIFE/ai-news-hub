@@ -24,16 +24,16 @@ export default function Header() {
       <div className="container-site flex items-center justify-between h-16">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold font-display tracking-tight">
-            AI News Hub
+            AI 新闻中心
           </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <Link href="/" className="hover:text-accent dark:hover:text-accent-dark transition-colors">
-            Latest
+            最新
           </Link>
           <Link href="/bookmarks" className="hover:text-accent dark:hover:text-accent-dark transition-colors">
-            Bookmarks
+            收藏夹
           </Link>
         </nav>
 
@@ -44,7 +44,7 @@ export default function Header() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search articles..."
+                placeholder="搜索文章..."
                 className="input-search w-48 md:w-64"
                 autoFocus
                 onBlur={() => {
@@ -66,7 +66,7 @@ export default function Header() {
             <button
               onClick={() => setSearchOpen(true)}
               className="p-2 text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
-              aria-label="Search"
+              aria-label="搜索"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -78,7 +78,7 @@ export default function Header() {
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="p-2 text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
-              aria-label="Toggle dark mode"
+              aria-label="切换深色模式"
             >
               {theme === 'dark' ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

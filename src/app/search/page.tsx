@@ -35,7 +35,7 @@ function SearchContent() {
     <div className="container-site py-10">
       <section className="mb-8 max-w-2xl">
         <h1 className="font-display text-3xl font-bold tracking-tight mb-4">
-          Search
+          搜索
         </h1>
         <SearchBar />
       </section>
@@ -43,19 +43,19 @@ function SearchContent() {
       <section>
         {loading ? (
           <div className="text-center py-20">
-            <p className="text-light-muted dark:text-dark-muted">Loading articles...</p>
+            <p className="text-light-muted dark:text-dark-muted">加载文章中...</p>
           </div>
         ) : query ? (
           <>
             <p className="text-light-muted dark:text-dark-muted mb-6">
-              {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{query}&rdquo;
+              找到 {results.length} 个关于 &ldquo;{query}&rdquo; 的结果
             </p>
             <ArticleList articles={results} />
           </>
         ) : (
           <div className="text-center py-20">
             <p className="text-light-muted dark:text-dark-muted">
-              Type to search across all articles.
+              输入关键词搜索所有文章。
             </p>
           </div>
         )}
@@ -69,7 +69,7 @@ export default function SearchPage() {
     <Suspense
       fallback={
         <div className="container-site py-10 text-center">
-          <p className="text-light-muted dark:text-dark-muted">Loading...</p>
+          <p className="text-light-muted dark:text-dark-muted">加载中...</p>
         </div>
       }
     >

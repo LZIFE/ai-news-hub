@@ -30,25 +30,25 @@ export default function BookmarksPage() {
     <div className="container-site py-10">
       <section className="mb-8">
         <h1 className="font-display text-3xl font-bold tracking-tight mb-3">
-          Bookmarks
+          收藏夹
         </h1>
         <p className="text-light-muted dark:text-dark-muted">
-          Your saved articles.
+          您保存的文章。
         </p>
       </section>
 
       <section>
         {loading ? (
           <div className="text-center py-20">
-            <p className="text-light-muted dark:text-dark-muted">Loading...</p>
+            <p className="text-light-muted dark:text-dark-muted">加载中...</p>
           </div>
         ) : articles.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-light-muted dark:text-dark-muted text-lg mb-4">
-              No bookmarks yet.
+              还没有收藏的文章。
             </p>
             <a href="/" className="btn-primary">
-              Browse articles
+              浏览文章
             </a>
           </div>
         ) : (

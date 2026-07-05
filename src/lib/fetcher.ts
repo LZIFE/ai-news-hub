@@ -1,6 +1,7 @@
 import Parser from 'rss-parser';
 import { Article } from './types';
 import { rssSources, DEFAULT_REVALIDATE } from './rss-sources';
+import { translateArticle } from './translator';
 
 const parser = new Parser({
   timeout: 10000,
@@ -34,26 +35,42 @@ function extractImage(item: Record<string, unknown>): string | undefined {
 async function fetchSingleSource(source: typeof rssSources[0]): Promise<Article[]> {
   try {
     const feed = await parser.parseURL(source.url);
-    return (feed.items || []).slice(0, 15).map((item) => {
-      const title = item.title || 'Untitled';
-      return {
-        id: slugify(title + source.name),
-        title,
-        description: item.contentSnippet
+    const items = (feed.items || []).slice(0, 15);
+    
+    const articles = await Promise.all(
+      items.map(async (item) => {
+        const title = item.title || 'Untitled';
+        const description = item.contentSnippet
           ? item.contentSnippet.slice(0, 300)
           : item.content
           ? item.content.replace(/<[^>]+>/g, '').slice(0, 300)
-          : '',
-        content: item['content:encoded'] || item.content || '',
-        url: item.link || '',
-        imageUrl: extractImage(item as Record<string, unknown>),
-        source: source.name,
-        sourceIcon: source.icon,
-        categories: item.categories || [],
-        publishedAt: item.isoDate || item.pubDate || new Date().toISOString(),
-        author: item.creator || item.author || source.name,
-      };
-    });
+          : '';
+        const content = item['content:encoded'] || item.content || '';
+        
+        const translation = source.category === 'english' 
+          ? await translateArticle({ title, description, content })
+          : { titleZh: title, descriptionZh: description, contentZh: content };
+        
+        return {
+          id: slugify(title + source.name),
+          title,
+          titleZh: translation.titleZh,
+          description,
+          descriptionZh: translation.descriptionZh,
+          content,
+          contentZh: translation.contentZh,
+          url: item.link || '',
+          imageUrl: extractImage(item as Record<string, unknown>),
+          source: source.name,
+          sourceIcon: source.icon,
+          categories: item.categories || [],
+          publishedAt: item.isoDate || item.pubDate || new Date().toISOString(),
+          author: item.creator || item.author || source.name,
+        };
+      })
+    );
+    
+    return articles;
   } catch (error) {
     console.error(`Failed to fetch ${source.name}:`, error);
     return [];

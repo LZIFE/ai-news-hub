@@ -14,7 +14,8 @@
     "react-dom": "^18.3.0",
     "rss-parser": "^3.13.0",
     "next-themes": "^0.3.0",
-    "flexsearch": "^0.7.43"
+    "flexsearch": "^0.7.43",
+    "@vitalets/google-translate-api": "^9.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

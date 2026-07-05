@@ -2,6 +2,7 @@ import { fetchAllArticles } from '@/lib/fetcher';
 import { DEFAULT_REVALIDATE } from '@/lib/rss-sources';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { Article } from '@/lib/types';
 
 export const revalidate = DEFAULT_REVALIDATE;
 
@@ -26,7 +27,7 @@ export default async function ArticlePage({
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
         </svg>
-        Back to feed
+        返回首页
       </Link>
 
       <article>
@@ -34,7 +35,7 @@ export default async function ArticlePage({
           <span>{article.sourceIcon}</span>
           <span className="font-medium">{article.source}</span>
           <span>·</span>
-          <time>{new Date(article.publishedAt).toLocaleDateString('en-US', {
+          <time>{new Date(article.publishedAt).toLocaleDateString('zh-CN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -47,15 +48,20 @@ export default async function ArticlePage({
           )}
         </div>
 
-        <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-6">
-          {article.title}
+        <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-2">
+          {article.titleZh || article.title}
         </h1>
+        {article.titleZh && article.titleZh !== article.title && (
+          <h2 className="font-display text-xl md:text-2xl text-light-muted dark:text-dark-muted mb-6">
+            {article.title}
+          </h2>
+        )}
 
         {article.imageUrl && (
           <div className="mb-8 overflow-hidden">
             <img
               src={article.imageUrl}
-              alt={article.title}
+              alt={article.titleZh || article.title}
               className="w-full aspect-video object-cover"
             />
           </div>
@@ -74,11 +80,38 @@ export default async function ArticlePage({
         </div>
 
         <div className="prose prose-lg dark:prose-invert max-w-none">
-          <p className="text-lg leading-relaxed text-light-muted dark:text-dark-muted">
-            {article.description}
-          </p>
+          <div className="p-4 rounded-lg bg-accent/5 dark:bg-accent-dark/10 mb-6">
+            <p className="text-lg leading-relaxed text-light-text dark:text-dark-text font-medium">
+              {article.descriptionZh || article.description}
+            </p>
+          </div>
 
-          {article.content && (
+          {article.descriptionZh && article.descriptionZh !== article.description && (
+            <p className="text-base leading-relaxed text-light-muted dark:text-dark-muted mb-6 italic">
+              {article.description}
+            </p>
+          )}
+
+          {article.contentZh && (
+            <div
+              dangerouslySetInnerHTML={{ __html: article.contentZh }}
+              className="mt-6 [&>img]:max-w-full [&>p]:leading-relaxed"
+            />
+          )}
+
+          {article.contentZh && article.content && (
+            <div className="mt-10 pt-6 border-t border-light-border dark:border-dark-border">
+              <h3 className="text-lg font-semibold mb-4 text-light-muted dark:text-dark-muted">
+                原文 / English Original
+              </h3>
+              <div
+                dangerouslySetInnerHTML={{ __html: article.content }}
+                className="text-sm text-light-muted dark:text-dark-muted [&>img]:max-w-full [&>p]:leading-relaxed opacity-75"
+              />
+            </div>
+          )}
+
+          {!article.contentZh && article.content && (
             <div
               dangerouslySetInnerHTML={{ __html: article.content }}
               className="mt-6 [&>img]:max-w-full [&>p]:leading-relaxed"
@@ -93,7 +126,7 @@ export default async function ArticlePage({
             rel="noopener noreferrer"
             className="btn-primary inline-flex items-center gap-2"
           >
-            Read original article
+            阅读原文
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>

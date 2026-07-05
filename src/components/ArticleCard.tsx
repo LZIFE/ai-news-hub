@@ -10,11 +10,11 @@ function timeAgo(dateStr: string): string {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return `${minutes}分钟前`;
+  if (hours < 24) return `${hours}小时前`;
+  if (days < 7) return `${days}天前`;
+  return new Date(dateStr).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
 }
 
 export default function ArticleCard({ article }: { article: Article }) {
@@ -43,13 +43,18 @@ export default function ArticleCard({ article }: { article: Article }) {
       </div>
 
       <Link href={`/articles/${slug}`} className="block">
-        <h2 className="font-semibold text-base leading-snug mb-2 group-hover:text-accent dark:group-hover:text-accent-dark transition-colors line-clamp-2">
-          {article.title}
+        <h2 className="font-semibold text-base leading-snug mb-1 group-hover:text-accent dark:group-hover:text-accent-dark transition-colors line-clamp-2">
+          {article.titleZh || article.title}
         </h2>
+        {article.titleZh && article.titleZh !== article.title && (
+          <p className="text-xs text-light-muted dark:text-dark-muted line-clamp-1 mb-2 italic">
+            {article.title}
+          </p>
+        )}
       </Link>
 
       <p className="text-sm text-light-muted dark:text-dark-muted leading-relaxed line-clamp-3 mb-3">
-        {article.description}
+        {article.descriptionZh || article.description}
       </p>
 
       <div className="flex items-center justify-between">

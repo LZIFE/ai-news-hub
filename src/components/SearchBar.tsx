@@ -38,7 +38,7 @@ export default function SearchBar() {
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder='Search articles... (press "/")'
+        placeholder='搜索文章... (按 "/")'
         className="input-search pl-10"
       />
       <svg

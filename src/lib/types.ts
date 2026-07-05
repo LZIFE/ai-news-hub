@@ -1,8 +1,11 @@
 export interface Article {
   id: string;
   title: string;
+  titleZh?: string;
   description: string;
+  descriptionZh?: string;
   content?: string;
+  contentZh?: string;
   url: string;
   imageUrl?: string;
   source: string;

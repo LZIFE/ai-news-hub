@@ -14,7 +14,7 @@ export default function BookmarkButton({ articleId }: { articleId: string }) {
         toggle(articleId);
       }}
       className="p-1.5 text-light-muted dark:text-dark-muted hover:text-accent dark:hover:text-accent-dark transition-colors"
-      aria-label={saved ? 'Remove bookmark' : 'Add bookmark'}
+      aria-label={saved ? '移除收藏' : '添加收藏'}
     >
       {saved ? (
         <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">

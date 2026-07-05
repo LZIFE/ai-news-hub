@@ -10,7 +10,7 @@ export default function Footer() {
     e.preventDefault();
     if (email.trim() && email.includes('@')) {
       window.open(
-        `mailto:?subject=Subscribe%20to%20AI%20News%20Hub&body=Please%20add%20me%20to%20the%20newsletter:%20${encodeURIComponent(email)}`,
+        `mailto:?subject=订阅%20AI%20新闻中心&body=请将我添加到通讯列表:%20${encodeURIComponent(email)}`,
         '_blank'
       );
       setSubmitted(true);
@@ -23,15 +23,15 @@ export default function Footer() {
       <div className="container-site py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="font-bold font-display text-lg mb-3">AI News Hub</h3>
+            <h3 className="font-bold font-display text-lg mb-3">AI 新闻中心</h3>
             <p className="text-light-muted dark:text-dark-muted text-sm leading-relaxed">
-              Curated AI news from the best sources, updated daily.
+              精选来自最佳来源的 AI 新闻，每日更新。
             </p>
           </div>
 
           <div>
             <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider text-light-muted dark:text-dark-muted">
-              Sources
+              来源
             </h4>
             <ul className="space-y-2 text-sm">
               <li><a href="https://techcrunch.com/category/artificial-intelligence/" target="_blank" rel="noopener" className="hover:text-accent dark:hover:text-accent-dark transition-colors">TechCrunch</a></li>
@@ -43,11 +43,11 @@ export default function Footer() {
 
           <div>
             <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider text-light-muted dark:text-dark-muted">
-              Newsletter
+              通讯订阅
             </h4>
             {submitted ? (
               <p className="text-sm text-green-600 dark:text-green-400">
-                Thank you! Check your email.
+                感谢订阅！请查看您的邮箱。
               </p>
             ) : (
               <form onSubmit={handleSubmit} className="flex gap-2">
@@ -60,7 +60,7 @@ export default function Footer() {
                   required
                 />
                 <button type="submit" className="btn-primary whitespace-nowrap">
-                  Subscribe
+                  订阅
                 </button>
               </form>
             )}
@@ -68,7 +68,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-light-border dark:border-dark-border text-center text-xs text-light-muted dark:text-dark-muted">
-          Built with Next.js. RSS feeds are property of their respective owners.
+          使用 Next.js 构建。RSS 订阅源版权归原作者所有。
         </div>
       </div>
     </footer>

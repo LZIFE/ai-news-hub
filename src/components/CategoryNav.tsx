@@ -1,14 +1,14 @@
 import Link from 'next/link';
 
 const categories = [
-  'Artificial Intelligence',
-  'Machine Learning',
-  'Large Language Models',
-  'Computer Vision',
-  'Robotics',
-  'AI Startups',
-  'AI Policy',
-  'Open Source',
+  '人工智能',
+  '机器学习',
+  '大语言模型',
+  '计算机视觉',
+  '机器人技术',
+  'AI 创业',
+  'AI 政策',
+  '开源',
 ];
 
 export default function CategoryNav({ active }: { active?: string }) {
@@ -22,7 +22,7 @@ export default function CategoryNav({ active }: { active?: string }) {
             : 'hover:border-accent dark:hover:border-accent-dark'
         }`}
       >
-        All
+        全部
       </Link>
       {categories.map((cat) => (
         <Link

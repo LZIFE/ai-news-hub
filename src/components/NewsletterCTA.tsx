@@ -10,7 +10,7 @@ export default function NewsletterCTA() {
     e.preventDefault();
     if (email.trim() && email.includes('@')) {
       window.open(
-        `mailto:?subject=Subscribe%20to%20AI%20News%20Hub&body=Please%20add%20me%20to%20the%20newsletter:%20${encodeURIComponent(email)}`,
+        `mailto:?subject=订阅%20AI%20新闻中心&body=请将我添加到通讯列表:%20${encodeURIComponent(email)}`,
         '_blank'
       );
       setSubmitted(true);
@@ -21,13 +21,13 @@ export default function NewsletterCTA() {
   return (
     <section className="card bg-gradient-to-br from-accent/5 to-accent-dark/5 dark:from-accent-dark/10 dark:to-accent/10">
       <div className="text-center max-w-md mx-auto">
-        <h3 className="font-bold font-display text-xl mb-2">Stay in the loop</h3>
+        <h3 className="font-bold font-display text-xl mb-2">保持关注</h3>
         <p className="text-sm text-light-muted dark:text-dark-muted mb-4">
-          Get the latest AI news delivered to your inbox. No spam, unsubscribe anytime.
+          获取最新 AI 资讯，直接发送到您的邮箱。无垃圾邮件，随时取消订阅。
         </p>
         {submitted ? (
           <p className="text-green-600 dark:text-green-400 font-medium">
-            Thanks for subscribing!
+            感谢订阅！
           </p>
         ) : (
           <form onSubmit={handleSubmit} className="flex gap-2">
@@ -40,7 +40,7 @@ export default function NewsletterCTA() {
               required
             />
             <button type="submit" className="btn-primary">
-              Subscribe
+              订阅
             </button>
           </form>
         )}

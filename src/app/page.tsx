@@ -13,10 +13,10 @@ export default async function HomePage() {
     <div className="container-site py-10">
       <section className="mb-12">
         <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-3">
-          Latest AI News
+          最新 AI 资讯
         </h1>
         <p className="text-light-muted dark:text-dark-muted text-lg max-w-2xl">
-          Curated stories from the best sources in artificial intelligence, machine learning, and technology.
+          来自人工智能、机器学习和技术领域最佳来源的精选内容。
         </p>
       </section>
 
