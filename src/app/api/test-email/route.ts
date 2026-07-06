@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+import { fetchAllArticles } from '@/lib/fetcher';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const apiKey = process.env.BUTTONDOWN_API_KEY;
@@ -6,55 +9,78 @@ export async function GET() {
     return NextResponse.json({ error: 'BUTTONDOWN_API_KEY not configured' }, { status: 500 });
   }
 
-  const today = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  try {
+    const allArticles = await fetchAllArticles();
 
-  const body = `# AI Daily Digest Test - ${today}
+    if (allArticles.length === 0) {
+      return NextResponse.json({ message: 'No articles to send' });
+    }
 
-## 1. OpenAI发布GPT-5，性能大幅提升
+    // Use top 20 articles
+    const articles = allArticles.slice(0, 20);
 
-**Source:** 量子位 · **Categories:** AI, 大模型
+    // Split into news and papers
+    const newsArticles = articles.filter(a => !a.categories.includes('论文'));
+    const paperArticles = articles.filter(a => a.categories.includes('论文'));
 
-OpenAI今日正式发布GPT-5模型，在多项基准测试中创下新纪录...
+    const today = new Date().toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+    });
 
-[Read more](https://example.com/article1)
+    let body = `# AI Daily Digest - ${today}\n\n`;
 
----
+    if (newsArticles.length > 0) {
+      body += `## AI资讯 (${newsArticles.length}篇)\n\n`;
+      body += newsArticles.map((article, i) => `### ${i + 1}. ${article.title}
 
-## 2. Google推出Gemini 2.0，多模态能力再升级
+**来源:** ${article.source} · **分类:** ${article.categories.join(', ')}
 
-**Source:** 机器之心 · **Categories:** AI, 多模态
+${article.description ? article.description.slice(0, 200) + '...' : ''}
 
-Google DeepMind发布Gemini 2.0，在图像、视频、代码等方面均有显著提升...
+[阅读原文](${article.url})`).join('\n\n---\n\n');
+      body += '\n\n';
+    }
 
-[Read more](https://example.com/article2)
+    if (paperArticles.length > 0) {
+      body += `## 论文 (${paperArticles.length}篇)\n\n`;
+      body += paperArticles.map((article, i) => `### ${i + 1}. ${article.title}
 
----
+**来源:** ${article.source} · **分类:** ${article.categories.join(', ')}
 
-This is a test email from AI News Hub.`;
+${article.description ? article.description.slice(0, 200) + '...' : ''}
 
-  const response = await fetch('https://api.buttondown.com/v1/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Token ${apiKey}`,
-      'Content-Type': 'application/json',
-      'X-Buttondown-Live-Dangerously': 'true',
-    },
-    body: JSON.stringify({
-      subject: `AI Daily Digest Test - ${today}`,
-      body: body,
-      status: 'about_to_send',
-    }),
-  });
+[阅读原文](${article.url})`).join('\n\n---\n\n');
+      body += '\n\n';
+    }
 
-  if (!response.ok) {
-    const error = await response.json();
-    return NextResponse.json({ error }, { status: response.status });
+    body += `---\n\n共 ${articles.length} 篇内容 | 发送时间: ${new Date().toISOString()}\n\nYou received this because you subscribed to AI Daily Digest.`;
+
+    const response = await fetch('https://api.buttondown.com/v1/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${apiKey}`,
+        'Content-Type': 'application/json',
+        'X-Buttondown-Live-Dangerously': 'true',
+      },
+      body: JSON.stringify({
+        subject: `AI Daily Digest - ${today} (${articles.length} articles)`,
+        body: body,
+        status: 'about_to_send',
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return NextResponse.json({ error }, { status: response.status });
+    }
+
+    const data = await response.json();
+    return NextResponse.json({ success: true, emailId: data.id });
+  } catch (error) {
+    console.error('Test email error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const data = await response.json();
-  return NextResponse.json({ success: true, emailId: data.id });
 }

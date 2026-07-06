@@ -4,27 +4,12 @@ import { fetchAllArticles } from '@/lib/fetcher';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  return handleDigest();
-}
-
-export async function POST(request: NextRequest) {
-  return handleDigest();
-}
-
-async function handleDigest() {
-
   const apiKey = process.env.BUTTONDOWN_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: 'BUTTONDOWN_API_KEY not configured' }, { status: 500 });
   }
 
   try {
-    // Force fresh fetch by adding timestamp
     const allArticles = await fetchAllArticles();
 
     if (allArticles.length === 0) {
@@ -42,19 +27,12 @@ async function handleDigest() {
       return pubDate >= yesterday8am && pubDate < today8am;
     });
 
-    // If no articles in the last 24 hours, skip sending
-    if (todayArticles.length === 0) {
-      return NextResponse.json({ message: 'No new articles in the last 24 hours, skipping send' });
-    }
+    // Use today's articles if available, otherwise use all articles
+    const articles = todayArticles.length > 0 ? todayArticles : allArticles;
 
-    const articles = todayArticles;
-
-    // Shuffle articles slightly to create unique content each time
-    const shuffledArticles = [...articles].sort(() => Math.random() - 0.5);
-    
     // Split into news and papers
-    const newsArticles = shuffledArticles.filter(a => !a.categories.includes('论文'));
-    const paperArticles = shuffledArticles.filter(a => a.categories.includes('论文'));
+    const newsArticles = articles.filter(a => !a.categories.includes('论文'));
+    const paperArticles = articles.filter(a => a.categories.includes('论文'));
 
     const today = new Date().toLocaleDateString('zh-CN', {
       year: 'numeric',
@@ -64,48 +42,32 @@ async function handleDigest() {
     });
 
     let body = `# AI Daily Digest - ${today}\n\n`;
-    
+
     if (newsArticles.length > 0) {
       body += `## AI资讯 (${newsArticles.length}篇)\n\n`;
-      body += newsArticles.map((article, i) => {
-        // Randomly extract different parts of the description
-        const desc = article.description || '';
-        const maxLen = Math.min(200, desc.length);
-        const startIdx = maxLen > 50 ? Math.floor(Math.random() * (maxLen - 50)) : 0;
-        const snippet = desc.slice(startIdx, startIdx + maxLen);
-        
-        return `### ${i + 1}. ${article.title}
+      body += newsArticles.map((article, i) => `### ${i + 1}. ${article.title}
 
 **来源:** ${article.source} · **分类:** ${article.categories.join(', ')}
 
-${snippet}...
+${article.description ? article.description.slice(0, 200) + '...' : ''}
 
-[阅读原文](${article.url})`;
-      }).join('\n\n---\n\n');
+[阅读原文](${article.url})`).join('\n\n---\n\n');
       body += '\n\n';
     }
 
     if (paperArticles.length > 0) {
       body += `## 论文 (${paperArticles.length}篇)\n\n`;
-      body += paperArticles.map((article, i) => {
-        // Randomly extract different parts of the description
-        const desc = article.description || '';
-        const maxLen = Math.min(200, desc.length);
-        const startIdx = maxLen > 50 ? Math.floor(Math.random() * (maxLen - 50)) : 0;
-        const snippet = desc.slice(startIdx, startIdx + maxLen);
-        
-        return `### ${i + 1}. ${article.title}
+      body += paperArticles.map((article, i) => `### ${i + 1}. ${article.title}
 
 **来源:** ${article.source} · **分类:** ${article.categories.join(', ')}
 
-${snippet}...
+${article.description ? article.description.slice(0, 200) + '...' : ''}
 
-[阅读原文](${article.url})`;
-      }).join('\n\n---\n\n');
+[阅读原文](${article.url})`).join('\n\n---\n\n');
       body += '\n\n';
     }
 
-    body += `共 ${articles.length} 篇内容 | ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`;  
+    body += `---\n\n共 ${articles.length} 篇内容 | 发送时间: ${new Date().toISOString()}\n\nYou received this because you subscribed to AI Daily Digest.`;
 
     const response = await fetch('https://api.buttondown.com/v1/emails', {
       method: 'POST',
@@ -115,10 +77,9 @@ ${snippet}...
         'X-Buttondown-Live-Dangerously': 'true',
       },
       body: JSON.stringify({
-        subject: `AI News Digest - ${new Date().toLocaleDateString('zh-CN', { weekday: 'long' })} ${articles.length} articles`,
+        subject: `AI Daily Digest - ${today} (${articles.length} articles)`,
         body: body,
         status: 'about_to_send',
-        email_type: 'transactional',
       }),
     });
 
@@ -131,7 +92,7 @@ ${snippet}...
     const data = await response.json();
     return NextResponse.json({ success: true, emailId: data.id });
   } catch (error) {
-    console.error('Digest cron error:', error);
+    console.error('Digest error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

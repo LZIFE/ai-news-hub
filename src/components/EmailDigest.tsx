@@ -27,9 +27,9 @@ export const EmailDigest: React.FC<Readonly<EmailDigestProps>> = ({
             <p style={{ fontSize: '14px', color: '#666', margin: '0 0 8px 0' }}>
               {article.source} · {article.categories.join(', ')}
             </p>
-            {article.summary && (
+            {article.description && (
               <p style={{ fontSize: '14px', color: '#333', margin: 0, lineHeight: '1.5' }}>
-                {article.summary.slice(0, 200)}...
+                {article.description.slice(0, 200)}...
               </p>
             )}
           </div>

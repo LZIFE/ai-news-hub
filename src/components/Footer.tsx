@@ -39,8 +39,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-                <span className="text-white font-display font-bold text-xs">AI</span>
+              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                <span className="text-white font-display font-bold text-sm">AI</span>
               </div>
               <h3 className="font-display font-bold text-lg">新闻中心</h3>
             </div>
