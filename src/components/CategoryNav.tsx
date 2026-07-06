@@ -1,25 +1,64 @@
 import Link from 'next/link';
 
-const categories = [
-  '人工智能',
-  '机器学习',
-  '大语言模型',
-  '计算机视觉',
-  '机器人技术',
-  'AI 创业',
-  'AI 政策',
-  '开源',
-];
+interface CategoryNavProps {
+  active?: string;
+  articles?: { categories: string[] }[];
+}
 
-export default function CategoryNav({ active }: { active?: string }) {
+export default function CategoryNav({ active, articles }: CategoryNavProps) {
+  if (articles) {
+    const seen = new Set<string>();
+    for (const a of articles) {
+      for (const c of a.categories) {
+        if (!seen.has(c)) seen.add(c);
+      }
+    }
+    const dynamicCategories = Array.from(seen).sort();
+    if (dynamicCategories.length > 0) {
+      return (
+        <nav className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <Link
+            href="/"
+            className={`badge whitespace-nowrap transition-all duration-200 ${
+              !active
+                ? 'bg-accent text-white border-accent shadow-sm'
+                : 'hover:border-accent/40 dark:hover:border-accent-dark/40'
+            }`}
+          >
+            全部
+          </Link>
+          {dynamicCategories.map((cat) => (
+            <Link
+              key={cat}
+              href={`/categories/${encodeURIComponent(cat)}`}
+              className={`badge whitespace-nowrap transition-all duration-200 ${
+                active === cat
+                  ? 'bg-accent text-white border-accent shadow-sm'
+                  : 'hover:border-accent/40 dark:hover:border-accent-dark/40'
+              }`}
+            >
+              {cat}
+            </Link>
+          ))}
+        </nav>
+      );
+    }
+  }
+
+  // Fallback static categories
+  const categories = [
+    'AI', '机器学习', '大语言模型', '计算机视觉',
+    '机器人', '创业', '科技', '开源',
+  ];
+
   return (
     <nav className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
       <Link
         href="/"
-        className={`badge whitespace-nowrap transition-colors ${
+        className={`badge whitespace-nowrap transition-all duration-200 ${
           !active
-            ? 'bg-accent text-white border-accent'
-            : 'hover:border-accent dark:hover:border-accent-dark'
+            ? 'bg-accent text-white border-accent shadow-sm'
+            : 'hover:border-accent/40 dark:hover:border-accent-dark/40'
         }`}
       >
         全部
@@ -28,10 +67,10 @@ export default function CategoryNav({ active }: { active?: string }) {
         <Link
           key={cat}
           href={`/categories/${encodeURIComponent(cat)}`}
-          className={`badge whitespace-nowrap transition-colors ${
+          className={`badge whitespace-nowrap transition-all duration-200 ${
             active === cat
-              ? 'bg-accent text-white border-accent'
-              : 'hover:border-accent dark:hover:border-accent-dark'
+              ? 'bg-accent text-white border-accent shadow-sm'
+              : 'hover:border-accent/40 dark:hover:border-accent-dark/40'
           }`}
         >
           {cat}

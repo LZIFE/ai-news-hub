@@ -1,21 +1,51 @@
+import { createHash } from 'crypto';
 import { translate } from '@vitalets/google-translate-api';
 
 const translationCache = new Map<string, { zh: string; timestamp: number }>();
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
+function cacheKey(text: string): string {
+  return createHash('md5').update(text).digest('hex');
+}
+
+function cleanHtmlForTranslation(html: string): string {
+  if (!html) return '';
+  
+  let cleaned = html;
+  
+  cleaned = cleaned.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  cleaned = cleaned.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  
+  cleaned = cleaned.replace(/<a\s+[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '$2');
+  
+  cleaned = cleaned.replace(/<[^>]+>/g, ' ');
+  
+  cleaned = cleaned.replace(/https?:\/\/[^\s<>"']+/g, '');
+  cleaned = cleaned.replace(/www\.[^\s<>"']+/g, '');
+  
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+  
+  return cleaned;
+}
+
 export async function translateToChinese(text: string): Promise<string> {
   if (!text || text.trim().length === 0) return '';
 
-  const cacheKey = text.slice(0, 100);
-  const cached = translationCache.get(cacheKey);
+  const key = cacheKey(text);
+  const cached = translationCache.get(key);
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.zh;
   }
 
   try {
-    const result = await translate(text, { to: 'zh-CN' });
+    const cleanText = cleanHtmlForTranslation(text);
+    if (cleanText.length < 5) {
+      return text;
+    }
+    
+    const result = await translate(cleanText, { to: 'zh-CN' });
     const translated = result.text;
-    translationCache.set(cacheKey, { zh: translated, timestamp: Date.now() });
+    translationCache.set(key, { zh: translated, timestamp: Date.now() });
     return translated;
   } catch (error) {
     console.error('Translation failed:', error);

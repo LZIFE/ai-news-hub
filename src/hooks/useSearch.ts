@@ -8,9 +8,17 @@ export function useSearch(articles: Article[]) {
   const [results, setResults] = useState<Article[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const indexRef = useRef<Record<string, unknown> | null>(null);
+  const articlesRef = useRef(articles);
+  const buildingRef = useRef(false);
 
   useEffect(() => {
     if (articles.length === 0) return;
+
+    // Skip rebuild if articles haven't changed
+    if (articlesRef.current === articles) return;
+    if (buildingRef.current) return;
+    articlesRef.current = articles;
+    buildingRef.current = true;
 
     const buildIndex = async () => {
       try {
@@ -31,6 +39,8 @@ export function useSearch(articles: Article[]) {
         indexRef.current = doc as unknown as Record<string, unknown>;
       } catch (err) {
         console.error('Failed to build search index:', err);
+      } finally {
+        buildingRef.current = false;
       }
     };
 

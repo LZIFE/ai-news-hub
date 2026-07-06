@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Article } from '@/lib/types';
 import BookmarkButton from './BookmarkButton';
 
@@ -17,33 +19,40 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
 }
 
-export default function ArticleCard({ article }: { article: Article }) {
+export default function ArticleCard({ article, style }: { article: Article; style?: React.CSSProperties }) {
   const slug = article.id;
+  const [imgError, setImgError] = useState(false);
 
   return (
-    <article className="card group relative">
-      {article.imageUrl && (
-        <Link href={`/articles/${slug}`} className="block mb-4 overflow-hidden">
-          <div className="aspect-video bg-light-border dark:bg-dark-border">
-            <img
+    <article className="card group relative flex flex-col h-full animate-slide-up" style={{ animationFillMode: 'both', ...style }}>
+      {article.imageUrl && !imgError && (
+        <Link href={`/articles/${slug}`} className="block mb-4 overflow-hidden rounded-lg">
+          <div className="aspect-video bg-light-border dark:bg-dark-border relative">
+            <Image
               src={article.imageUrl}
               alt={article.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              width={600}
+              height={338}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
+              onError={() => setImgError(true)}
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         </Link>
       )}
 
-      <div className="flex items-center gap-2 text-xs text-light-muted dark:text-dark-muted mb-2">
-        <span>{article.sourceIcon}</span>
-        <span>{article.source}</span>
-        <span>·</span>
-        <time>{timeAgo(article.publishedAt)}</time>
+      <div className="flex items-center gap-2 text-xs text-light-muted dark:text-dark-muted mb-3">
+        <span className="flex items-center gap-1.5">
+          <span className="text-base">{article.sourceIcon}</span>
+          <span className="font-medium">{article.source}</span>
+        </span>
+        <span className="text-light-border dark:text-dark-border">·</span>
+        <time className="font-mono text-[11px]">{timeAgo(article.publishedAt)}</time>
       </div>
 
-      <Link href={`/articles/${slug}`} className="block">
-        <h2 className="font-semibold text-base leading-snug mb-1 group-hover:text-accent dark:group-hover:text-accent-dark transition-colors line-clamp-2">
+      <Link href={`/articles/${slug}`} className="block flex-1">
+        <h2 className="font-display font-semibold text-[15px] leading-snug mb-1.5 group-hover:text-accent dark:group-hover:text-accent-dark transition-colors duration-200 line-clamp-2">
           {article.titleZh || article.title}
         </h2>
         {article.titleZh && article.titleZh !== article.title && (
@@ -53,17 +62,17 @@ export default function ArticleCard({ article }: { article: Article }) {
         )}
       </Link>
 
-      <p className="text-sm text-light-muted dark:text-dark-muted leading-relaxed line-clamp-3 mb-3">
+      <p className="text-sm text-light-muted dark:text-dark-muted leading-relaxed line-clamp-2 mb-4">
         {article.descriptionZh || article.description}
       </p>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-light-border/50 dark:border-dark-border/50">
         <div className="flex gap-1.5 flex-wrap">
           {article.categories.slice(0, 2).map((cat) => (
             <Link
               key={cat}
               href={`/categories/${encodeURIComponent(cat)}`}
-              className="badge hover:border-accent dark:hover:border-accent-dark transition-colors"
+              className="badge"
             >
               {cat}
             </Link>

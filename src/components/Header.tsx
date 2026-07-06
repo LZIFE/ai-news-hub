@@ -20,24 +20,39 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-light-border dark:border-dark-border bg-light-bg/80 dark:bg-dark-bg/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-light-border/60 dark:border-dark-border/60 bg-light-bg/85 dark:bg-dark-bg/85 backdrop-blur-xl">
       <div className="container-site flex items-center justify-between h-16">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold font-display tracking-tight">
-            AI 新闻中心
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
+            <span className="text-white font-display font-bold text-sm">AI</span>
+          </div>
+          <span className="text-lg font-display font-bold tracking-tight hidden sm:block">
+            新闻中心
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <Link href="/" className="hover:text-accent dark:hover:text-accent-dark transition-colors">
+        <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+          <Link
+            href="/"
+            className="px-3 py-1.5 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
+          >
             最新
           </Link>
-          <Link href="/bookmarks" className="hover:text-accent dark:hover:text-accent-dark transition-colors">
+          <Link
+            href="/papers"
+            className="px-3 py-1.5 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
+          >
+            论文
+          </Link>
+          <Link
+            href="/bookmarks"
+            className="px-3 py-1.5 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
+          >
             收藏夹
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {searchOpen ? (
             <form onSubmit={handleSearch} className="flex items-center">
               <input
@@ -57,15 +72,17 @@ export default function Header() {
                   setSearchOpen(false);
                   setSearchQuery('');
                 }}
-                className="ml-2 text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text"
+                className="ml-2 p-1.5 rounded-lg text-light-muted dark:text-dark-muted hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
               >
-                ✕
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </form>
           ) : (
             <button
               onClick={() => setSearchOpen(true)}
-              className="p-2 text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
+              className="p-2 rounded-lg text-light-muted dark:text-dark-muted hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
               aria-label="搜索"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +94,7 @@ export default function Header() {
           {mounted && (
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
+              className="p-2 rounded-lg text-light-muted dark:text-dark-muted hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
               aria-label="切换深色模式"
             >
               {theme === 'dark' ? (

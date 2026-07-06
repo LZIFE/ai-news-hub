@@ -1,5 +1,3 @@
-import { Article } from './types';
-
 const STORAGE_KEY = 'ai-news-bookmarks';
 
 export function getBookmarks(): string[] {
@@ -27,9 +25,4 @@ export function removeBookmark(articleId: string): void {
 
 export function isBookmarked(articleId: string): boolean {
   return getBookmarks().includes(articleId);
-}
-
-export function getBookmarkedArticles(allArticles: Article[]): Article[] {
-  const bookmarks = getBookmarks();
-  return allArticles.filter((a) => bookmarks.includes(a.id));
 }

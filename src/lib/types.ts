@@ -26,3 +26,17 @@ export interface SearchResult {
   article: Article;
   score: number;
 }
+
+export interface Paper {
+  id: string;
+  title: string;
+  authors: string[];
+  abstract: string;
+  categories: string[];
+  publishedAt: string;
+  pdfUrl: string;
+  arxivUrl: string;
+  source: 'arxiv' | 'openalex' | 'semantic-scholar';
+  citationCount?: number;
+  venue?: string;
+}

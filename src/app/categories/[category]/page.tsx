@@ -1,4 +1,5 @@
 import { fetchAllArticles } from '@/lib/fetcher';
+import { serialize } from '@/lib/serialize';
 import { DEFAULT_REVALIDATE } from '@/lib/rss-sources';
 import ArticleList from '@/components/ArticleList';
 import CategoryNav from '@/components/CategoryNav';
@@ -11,7 +12,7 @@ export default async function CategoryPage({
   params: { category: string };
 }) {
   const category = decodeURIComponent(params.category);
-  const allArticles = await fetchAllArticles();
+  const allArticles = serialize(await fetchAllArticles());
   const articles = allArticles.filter((a) =>
     a.categories.some(
       (c) => c.toLowerCase() === category.toLowerCase()
@@ -25,12 +26,12 @@ export default async function CategoryPage({
           {category}
         </h1>
         <p className="text-light-muted dark:text-dark-muted">
-          {articles.length} article{articles.length !== 1 ? 's' : ''}
+          {articles.length} 篇文章
         </p>
       </section>
 
       <section className="mb-8">
-        <CategoryNav active={category} />
+        <CategoryNav active={category} articles={allArticles} />
       </section>
 
       <section>
