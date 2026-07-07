@@ -45,6 +45,12 @@ export default function Header() {
             论文
           </Link>
           <Link
+            href="/monitor"
+            className="px-3 py-1.5 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
+          >
+            传媒
+          </Link>
+          <Link
             href="/bookmarks"
             className="px-3 py-1.5 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
           >

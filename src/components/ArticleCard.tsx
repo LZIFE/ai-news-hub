@@ -19,14 +19,14 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
 }
 
-export default function ArticleCard({ article, style }: { article: Article; style?: React.CSSProperties }) {
+export default function ArticleCard({ article, style, linkPrefix = '/articles/' }: { article: Article; style?: React.CSSProperties; linkPrefix?: string }) {
   const slug = article.id;
   const [imgError, setImgError] = useState(false);
 
   return (
     <article className="card group relative flex flex-col h-full animate-slide-up" style={{ animationFillMode: 'both', ...style }}>
       {article.imageUrl && !imgError && (
-        <Link href={`/articles/${slug}`} className="block mb-4 overflow-hidden rounded-lg">
+        <Link href={`${linkPrefix}${slug}`} className="block mb-4 overflow-hidden rounded-lg">
           <div className="aspect-video bg-light-border dark:bg-dark-border relative">
             <Image
               src={article.imageUrl}
@@ -51,7 +51,7 @@ export default function ArticleCard({ article, style }: { article: Article; styl
         <time className="font-mono text-[11px]">{timeAgo(article.publishedAt)}</time>
       </div>
 
-      <Link href={`/articles/${slug}`} className="block flex-1">
+      <Link href={`${linkPrefix}${slug}`} className="block flex-1">
         <h2 className="font-display font-semibold text-[15px] leading-snug mb-1.5 group-hover:text-accent dark:group-hover:text-accent-dark transition-colors duration-200 line-clamp-2">
           {article.titleZh || article.title}
         </h2>
@@ -68,15 +68,20 @@ export default function ArticleCard({ article, style }: { article: Article; styl
 
       <div className="flex items-center justify-between mt-auto pt-3 border-t border-light-border/50 dark:border-dark-border/50">
         <div className="flex gap-1.5 flex-wrap">
-          {article.categories.slice(0, 2).map((cat) => (
-            <Link
-              key={cat}
-              href={`/categories/${encodeURIComponent(cat)}`}
-              className="badge"
-            >
-              {cat}
-            </Link>
-          ))}
+          {article.categories.slice(0, 2).map((cat) => {
+            const href = linkPrefix === '/monitor/'
+              ? `/monitor?source=${encodeURIComponent(cat)}`
+              : `/categories/${encodeURIComponent(cat)}`;
+            return (
+              <Link
+                key={cat}
+                href={href}
+                className="badge"
+              >
+                {cat}
+              </Link>
+            );
+          })}
         </div>
 
         <BookmarkButton articleId={article.id} />

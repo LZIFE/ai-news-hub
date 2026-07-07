@@ -7,7 +7,7 @@ import Pagination from './Pagination';
 
 const PAGE_SIZE = 12;
 
-export default function ArticleList({ articles }: { articles: Article[] }) {
+export default function ArticleList({ articles, linkPrefix = '/articles/' }: { articles: Article[]; linkPrefix?: string }) {
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(articles.length / PAGE_SIZE);
   const start = (page - 1) * PAGE_SIZE;
@@ -30,6 +30,7 @@ export default function ArticleList({ articles }: { articles: Article[] }) {
           <ArticleCard
             key={article.id}
             article={article}
+            linkPrefix={linkPrefix}
             style={{ animationDelay: `${index * 60}ms` }}
           />
         ))}
