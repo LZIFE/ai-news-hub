@@ -13,99 +13,35 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   return handleDigest();
 }
 
 async function handleDigest() {
-
   const apiKey = process.env.BUTTONDOWN_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: 'BUTTONDOWN_API_KEY not configured' }, { status: 500 });
   }
 
   try {
-    // Force fresh fetch by adding timestamp
     const allArticles = await fetchAllArticles();
 
     if (allArticles.length === 0) {
       return NextResponse.json({ message: 'No articles to send' });
     }
 
-    // Filter articles from last 24 hours (8am today to 7:59am next day)
-    const now = new Date();
-    const today8am = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 8, 0, 0));
-    const yesterday8am = new Date(today8am);
-    yesterday8am.setUTCDate(yesterday8am.getUTCDate() - 1);
-
-    const todayArticles = allArticles.filter(article => {
-      const pubDate = new Date(article.publishedAt);
-      return pubDate >= yesterday8am && pubDate < today8am;
-    });
+    const { buildDigest, filterLast24Hours } = await import('@/lib/digest');
+    const todayArticles = filterLast24Hours(allArticles);
 
     // If no articles in the last 24 hours, skip sending
     if (todayArticles.length === 0) {
       return NextResponse.json({ message: 'No new articles in the last 24 hours, skipping send' });
     }
 
-    const articles = todayArticles;
-
-    // Shuffle articles slightly to create unique content each time
-    const shuffledArticles = [...articles].sort(() => Math.random() - 0.5);
-    
-    // Split into news and papers
-    const newsArticles = shuffledArticles.filter(a => !a.categories.includes('论文'));
-    const paperArticles = shuffledArticles.filter(a => a.categories.includes('论文'));
-
-    const today = new Date().toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long',
-    });
-
-    let body = `# AI Daily Digest - ${today}\n\n`;
-    
-    if (newsArticles.length > 0) {
-      body += `## AI资讯 (${newsArticles.length}篇)\n\n`;
-      body += newsArticles.map((article, i) => {
-        // Randomly extract different parts of the description
-        const desc = article.description || '';
-        const maxLen = Math.min(200, desc.length);
-        const startIdx = maxLen > 50 ? Math.floor(Math.random() * (maxLen - 50)) : 0;
-        const snippet = desc.slice(startIdx, startIdx + maxLen);
-        
-        return `### ${i + 1}. ${article.title}
-
-**来源:** ${article.source} · **分类:** ${article.categories.join(', ')}
-
-${snippet}...
-
-[阅读原文](${article.url})`;
-      }).join('\n\n---\n\n');
-      body += '\n\n';
-    }
-
-    if (paperArticles.length > 0) {
-      body += `## 论文 (${paperArticles.length}篇)\n\n`;
-      body += paperArticles.map((article, i) => {
-        // Randomly extract different parts of the description
-        const desc = article.description || '';
-        const maxLen = Math.min(200, desc.length);
-        const startIdx = maxLen > 50 ? Math.floor(Math.random() * (maxLen - 50)) : 0;
-        const snippet = desc.slice(startIdx, startIdx + maxLen);
-        
-        return `### ${i + 1}. ${article.title}
-
-**来源:** ${article.source} · **分类:** ${article.categories.join(', ')}
-
-${snippet}...
-
-[阅读原文](${article.url})`;
-      }).join('\n\n---\n\n');
-      body += '\n\n';
-    }
-
-    body += `共 ${articles.length} 篇内容 | ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`;  
+    const { subject, body } = buildDigest(todayArticles);
 
     const response = await fetch('https://api.buttondown.com/v1/emails', {
       method: 'POST',
@@ -115,8 +51,8 @@ ${snippet}...
         'X-Buttondown-Live-Dangerously': 'true',
       },
       body: JSON.stringify({
-        subject: `AI News Digest - ${new Date().toLocaleDateString('zh-CN', { weekday: 'long' })} ${articles.length} articles`,
-        body: body,
+        subject,
+        body,
         status: 'about_to_send',
         email_type: 'transactional',
       }),

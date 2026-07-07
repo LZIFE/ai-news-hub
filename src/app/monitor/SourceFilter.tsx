@@ -90,7 +90,7 @@ export default function SourceFilter({ groups, articles }: { groups: SourceGroup
         </p>
       )}
 
-      <ArticleList key={selectedSource || 'all'} articles={filtered} linkPrefix="/monitor/" />
+      <ArticleList articles={filtered} linkPrefix="/monitor/" />
     </div>
   );
 }

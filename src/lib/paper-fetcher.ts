@@ -1,5 +1,6 @@
 import { Paper } from './types';
 import { arxivCategories } from './paper-sources';
+import { withTtlCache } from './feed-utils';
 
 // ─── arXiv API ───────────────────────────────────────────────
 
@@ -111,10 +112,11 @@ async function fetchFromOpenAlex(): Promise<Paper[]> {
   ];
 
   const papers: Paper[] = [];
+  const since = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
 
   for (const conceptId of conceptIds) {
     try {
-      const url = `https://api.openalex.org/works?filter=concepts.id:${conceptId},from_publication_date:2026-06-01,is_oa:true&per_page=15&select=id,title,authorships,abstract_inverted_index,publication_date,doi,primary_location,cited_by_count,concepts`;
+      const url = `https://api.openalex.org/works?filter=concepts.id:${conceptId},from_publication_date:${since},is_oa:true&per_page=15&select=id,title,authorships,abstract_inverted_index,publication_date,doi,primary_location,cited_by_count,concepts`;
       const res = await fetch(url, {
         headers: { 'User-Agent': 'AI News Hub (mailto:ai-news@example.com)' },
         signal: AbortSignal.timeout(15000),
@@ -205,55 +207,45 @@ async function enrichWithSemanticScholar(papers: Paper[]): Promise<Paper[]> {
 
 // ─── Main fetcher ────────────────────────────────────────────
 
-let cachedPromise: Promise<Paper[]> | null = null;
-let cacheTimestamp = 0;
-const CACHE_TTL = 5000;
+const fetchWithCache = withTtlCache<Paper[]>(async () => {
+  const [arxivResults, openalexResults] = await Promise.allSettled([
+    Promise.all(arxivCategories.map((cat) => fetchFromArxiv(cat.id))),
+    fetchFromOpenAlex(),
+  ]);
 
-export async function fetchAllPapers(): Promise<Paper[]> {
-  const now = Date.now();
-  if (cachedPromise && now - cacheTimestamp < CACHE_TTL) {
-    return cachedPromise;
+  const arxivPapers = arxivResults.status === 'fulfilled'
+    ? arxivResults.value.flat()
+    : [];
+
+  const openalexPapers = openalexResults.status === 'fulfilled'
+    ? openalexResults.value
+    : [];
+
+  let allPapers = [...arxivPapers, ...openalexPapers];
+
+  // Deduplicate by arXiv ID or title
+  const seenIds = new Set<string>();
+  const seenTitles = new Set<string>();
+  const deduplicated: Paper[] = [];
+
+  for (const paper of allPapers) {
+    const normTitle = paper.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (seenIds.has(paper.id) || seenTitles.has(normTitle)) continue;
+    seenIds.add(paper.id);
+    seenTitles.add(normTitle);
+    deduplicated.push(paper);
   }
 
-  cachedPromise = (async () => {
-    const [arxivResults, openalexResults] = await Promise.allSettled([
-      Promise.all(arxivCategories.map((cat) => fetchFromArxiv(cat.id))),
-      fetchFromOpenAlex(),
-    ]);
+  // Enrich with Semantic Scholar citation data
+  await enrichWithSemanticScholar(deduplicated);
 
-    const arxivPapers = arxivResults.status === 'fulfilled'
-      ? arxivResults.value.flat()
-      : [];
+  return deduplicated.sort(
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  );
+}, 5000);
 
-    const openalexPapers = openalexResults.status === 'fulfilled'
-      ? openalexResults.value
-      : [];
-
-    let allPapers = [...arxivPapers, ...openalexPapers];
-
-    // Deduplicate by arXiv ID or title
-    const seenIds = new Set<string>();
-    const seenTitles = new Set<string>();
-    const deduplicated: Paper[] = [];
-
-    for (const paper of allPapers) {
-      const normTitle = paper.title.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (seenIds.has(paper.id) || seenTitles.has(normTitle)) continue;
-      seenIds.add(paper.id);
-      seenTitles.add(normTitle);
-      deduplicated.push(paper);
-    }
-
-    // Enrich with Semantic Scholar citation data
-    await enrichWithSemanticScholar(deduplicated);
-
-    return deduplicated.sort(
-      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-    );
-  })();
-
-  cacheTimestamp = now;
-  return cachedPromise;
+export async function fetchAllPapers(): Promise<Paper[]> {
+  return fetchWithCache();
 }
 
 export async function fetchPaperById(id: string): Promise<Paper | undefined> {

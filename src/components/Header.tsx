@@ -3,19 +3,23 @@
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => setMounted(true), []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
     }
   };
 
@@ -59,6 +63,22 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Mobile nav toggle */}
+          <button
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            className="md:hidden p-2 rounded-lg text-light-muted dark:text-dark-muted hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors"
+            aria-label="导航菜单"
+            aria-expanded={mobileNavOpen}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileNavOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
           {searchOpen ? (
             <form onSubmit={handleSearch} className="flex items-center">
               <input
@@ -116,6 +136,18 @@ export default function Header() {
           )}
         </div>
       </div>
+
+      {/* Mobile navigation */}
+      {mobileNavOpen && (
+        <nav className="md:hidden border-t border-light-border/60 dark:border-dark-border/60 bg-light-bg/95 dark:bg-dark-bg/95 backdrop-blur-xl">
+          <div className="container-site flex flex-col py-3 gap-1 text-sm font-medium">
+            <Link href="/" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors">最新</Link>
+            <Link href="/papers" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors">论文</Link>
+            <Link href="/monitor" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors">传媒</Link>
+            <Link href="/bookmarks" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-light-border/50 dark:hover:bg-dark-border/50 transition-colors">收藏夹</Link>
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

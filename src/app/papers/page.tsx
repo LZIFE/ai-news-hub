@@ -5,8 +5,18 @@ import PaperCategoryNav from '@/components/PaperCategoryNav';
 
 export const dynamic = 'force-dynamic';
 
-export default async function PapersPage() {
-  const papers = serialize(await fetchAllPapers());
+export default async function PapersPage({
+  searchParams,
+}: {
+  searchParams: { category?: string };
+}) {
+  const allPapers = serialize(await fetchAllPapers());
+  const active = searchParams.category;
+  const papers = active
+    ? allPapers.filter((p) =>
+        p.categories.some((c) => c.toLowerCase() === active.toLowerCase())
+      )
+    : allPapers;
 
   return (
     <div className="container-site py-10">
@@ -24,7 +34,7 @@ export default async function PapersPage() {
       </section>
 
       <section className="mb-8">
-        <PaperCategoryNav papers={papers} />
+        <PaperCategoryNav active={active} papers={allPapers} />
       </section>
 
       <section className="mb-16">

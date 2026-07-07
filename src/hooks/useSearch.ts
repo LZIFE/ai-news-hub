@@ -64,7 +64,8 @@ export function useSearch(articles: Article[]) {
       };
       const searchResults = doc.search(searchQuery);
       const ids = searchResults.flatMap((r) => r.result);
-      const matched = articles.filter((a) => ids.includes(a.id));
+      const idSet = new Set(ids);
+      const matched = articles.filter((a) => idSet.has(a.id));
 
       setResults(matched);
       setIsSearching(false);

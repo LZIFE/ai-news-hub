@@ -1,7 +1,7 @@
 import Parser from 'rss-parser';
-import { createHash } from 'crypto';
 import { Article } from './types';
 import { mediaSources } from './media-rss-sources';
+import { makeId, normalizeTitle, normalizeUrl, dedupeByTitleAndUrl, sortByDate, withTtlCache } from './feed-utils';
 
 const parser = new Parser({
   timeout: 10000,
@@ -9,10 +9,6 @@ const parser = new Parser({
     'User-Agent': 'Media Monitor/1.0',
   },
 });
-
-function makeId(text: string): string {
-  return createHash('md5').update(text).digest('hex').slice(0, 16);
-}
 
 function extractImage(item: Record<string, unknown>): string | undefined {
   const enclosure = item.enclosure as { url?: string } | undefined;
@@ -22,10 +18,13 @@ function extractImage(item: Record<string, unknown>): string | undefined {
   if (mediaContent?.$?.url) return mediaContent.$.url;
 
   const content = (item['content:encoded'] || item.content || '') as string;
-  const srcMatch = content.match(/<img[^>]+src="([^"]+)"/);
-  if (srcMatch) return srcMatch[1];
-
-  return undefined;
+  try {
+    const cheerio = require('cheerio') as { load: (html: string) => cheerio.CheerioAPI };
+    const $ = cheerio.load(content);
+    return $('img').first().attr('src') || undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 async function fetchSingleSource(source: typeof mediaSources[0]): Promise<Article[]> {
@@ -67,65 +66,20 @@ async function fetchSingleSource(source: typeof mediaSources[0]): Promise<Articl
   }
 }
 
-function normalizeTitle(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[\s\-—–·:：,，。.!！?？""''「」【】\(\)（）\[\]]/g, '')
-    .trim();
-}
+const fetchWithCache = withTtlCache<Article[]>(async () => {
+  const results = await Promise.allSettled(
+    mediaSources.map((source) => fetchSingleSource(source))
+  );
 
-function normalizeUrl(url: string): string {
-  try {
-    const u = new URL(url);
-    return `${u.hostname}${u.pathname}`.toLowerCase().replace(/\/+$/, '');
-  } catch {
-    return url.toLowerCase();
-  }
-}
+  const articles = results
+    .filter((r): r is PromiseFulfilledResult<Article[]> => r.status === 'fulfilled')
+    .flatMap((r) => r.value);
 
-let cachedPromise: Promise<Article[]> | null = null;
-let cacheTimestamp = 0;
-const CACHE_TTL = 5000;
+  return sortByDate(dedupeByTitleAndUrl(articles));
+}, 5000);
 
 export async function fetchMediaArticles(): Promise<Article[]> {
-  const now = Date.now();
-  if (cachedPromise && now - cacheTimestamp < CACHE_TTL) {
-    return cachedPromise;
-  }
-
-  cachedPromise = (async () => {
-    const results = await Promise.allSettled(
-      mediaSources.map((source) => fetchSingleSource(source))
-    );
-
-    const articles = results
-      .filter((r): r is PromiseFulfilledResult<Article[]> => r.status === 'fulfilled')
-      .flatMap((r) => r.value);
-
-    const seenTitles = new Set<string>();
-    const seenUrls = new Set<string>();
-    const deduplicated: Article[] = [];
-
-    for (const article of articles) {
-      const normTitle = normalizeTitle(article.titleZh || article.title);
-      const normUrl = normalizeUrl(article.url);
-
-      if (seenTitles.has(normTitle) || (article.url && seenUrls.has(normUrl))) {
-        continue;
-      }
-
-      seenTitles.add(normTitle);
-      if (article.url) seenUrls.add(normUrl);
-      deduplicated.push(article);
-    }
-
-    return deduplicated.sort(
-      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-    );
-  })();
-
-  cacheTimestamp = now;
-  return cachedPromise;
+  return fetchWithCache();
 }
 
 export function getSourceGroups(): { label: string; sources: string[] }[] {

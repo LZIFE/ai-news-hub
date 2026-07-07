@@ -52,12 +52,12 @@ export default function Footer() {
           <div>
             <h4 className="section-label mb-4">来源</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="https://techcrunch.com/category/artificial-intelligence/" target="_blank" rel="noopener" className="hover:text-accent dark:hover:text-accent-dark transition-colors">TechCrunch</a></li>
-              <li><a href="https://www.theverge.com/ai-artificial-intelligence" target="_blank" rel="noopener" className="hover:text-accent dark:hover:text-accent-dark transition-colors">The Verge</a></li>
-              <li><a href="https://www.technologyreview.com/topic/artificial-intelligence/" target="_blank" rel="noopener" className="hover:text-accent dark:hover:text-accent-dark transition-colors">MIT Tech Review</a></li>
-              <li><a href="https://venturebeat.com/category/ai/" target="_blank" rel="noopener" className="hover:text-accent dark:hover:text-accent-dark transition-colors">VentureBeat</a></li>
-              <li><a href="https://www.jiqizhixin.com/" target="_blank" rel="noopener" className="hover:text-accent dark:hover:text-accent-dark transition-colors">机器之心</a></li>
-              <li><a href="https://www.qbitai.com/" target="_blank" rel="noopener" className="hover:text-accent dark:hover:text-accent-dark transition-colors">量子位</a></li>
+              <li><a href="https://techcrunch.com/category/artificial-intelligence/" target="_blank" rel="noopener noreferrer" className="hover:text-accent dark:hover:text-accent-dark transition-colors">TechCrunch</a></li>
+              <li><a href="https://www.theverge.com/ai-artificial-intelligence" target="_blank" rel="noopener noreferrer" className="hover:text-accent dark:hover:text-accent-dark transition-colors">The Verge</a></li>
+              <li><a href="https://www.technologyreview.com/topic/artificial-intelligence/" target="_blank" rel="noopener noreferrer" className="hover:text-accent dark:hover:text-accent-dark transition-colors">MIT Tech Review</a></li>
+              <li><a href="https://venturebeat.com/category/ai/" target="_blank" rel="noopener noreferrer" className="hover:text-accent dark:hover:text-accent-dark transition-colors">VentureBeat</a></li>
+              <li><a href="https://www.jiqizhixin.com/" target="_blank" rel="noopener noreferrer" className="hover:text-accent dark:hover:text-accent-dark transition-colors">机器之心</a></li>
+              <li><a href="https://www.qbitai.com/" target="_blank" rel="noopener noreferrer" className="hover:text-accent dark:hover:text-accent-dark transition-colors">量子位</a></li>
             </ul>
           </div>
 
@@ -77,12 +77,15 @@ export default function Footer() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex gap-2">
+                <label htmlFor="footer-email" className="sr-only">邮箱地址</label>
                 <input
+                  id="footer-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   className="input-search flex-1"
+                  autoComplete="email"
                   required
                 />
                 <button type="submit" disabled={loading} className="btn-primary whitespace-nowrap disabled:opacity-50">

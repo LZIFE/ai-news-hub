@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -8,6 +10,12 @@ function timeAgo(dateStr: string): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
   const diff = now - then;
+
+  // Guard against future dates
+  if (diff < 0) {
+    return new Date(dateStr).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+  }
+
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
@@ -69,7 +77,10 @@ export default function ArticleCard({ article, style, linkPrefix = '/articles/' 
       <div className="flex items-center justify-between mt-auto pt-3 border-t border-light-border/50 dark:border-dark-border/50">
         <div className="flex gap-1.5 flex-wrap">
           {article.categories.slice(0, 2).map((cat) => {
-            const href = linkPrefix === '/monitor/'
+            const isMonitor = linkPrefix === '/monitor/';
+            // In monitor mode, skip the generic '传媒监控' category badge
+            if (isMonitor && cat === '传媒监控') return null;
+            const href = isMonitor
               ? `/monitor?source=${encodeURIComponent(cat)}`
               : `/categories/${encodeURIComponent(cat)}`;
             return (

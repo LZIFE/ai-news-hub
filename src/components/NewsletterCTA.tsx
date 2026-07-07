@@ -57,12 +57,15 @@ export default function NewsletterCTA() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex gap-2">
+            <label htmlFor="newsletter-email" className="sr-only">邮箱地址</label>
             <input
+              id="newsletter-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               className="input-search flex-1"
+              autoComplete="email"
               required
             />
             <button

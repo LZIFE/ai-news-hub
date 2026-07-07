@@ -1,25 +1,36 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useSyncExternalStore, useCallback } from 'react';
 import { getBookmarks, addBookmark, removeBookmark } from '@/lib/bookmarks';
 
-export function useBookmarks() {
-  const [bookmarks, setBookmarks] = useState<string[]>([]);
+/**
+ * Subscribe to bookmark changes from any tab/instance.
+ */
+function subscribe(cb: () => void) {
+  window.addEventListener('storage', cb);
+  window.addEventListener('bookmarks-changed', cb);
+  return () => {
+    window.removeEventListener('storage', cb);
+    window.removeEventListener('bookmarks-changed', cb);
+  };
+}
 
-  useEffect(() => {
-    setBookmarks(getBookmarks());
-  }, []);
+function getSnapshot(): string[] {
+  return getBookmarks();
+}
+
+export function useBookmarks() {
+  const bookmarks = useSyncExternalStore(subscribe, getSnapshot, () => [] as string[]);
 
   const toggle = useCallback((articleId: string) => {
-    setBookmarks((prev) => {
-      if (prev.includes(articleId)) {
-        removeBookmark(articleId);
-        return prev.filter((id) => id !== articleId);
-      } else {
-        addBookmark(articleId);
-        return [...prev, articleId];
-      }
-    });
+    const current = getBookmarks();
+    if (current.includes(articleId)) {
+      removeBookmark(articleId);
+    } else {
+      addBookmark(articleId);
+    }
+    // Notify other instances
+    window.dispatchEvent(new Event('bookmarks-changed'));
   }, []);
 
   const isSaved = useCallback(

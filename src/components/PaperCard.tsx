@@ -5,6 +5,12 @@ function timeAgo(dateStr: string): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
   const diff = now - then;
+
+  // Guard against future dates
+  if (diff < 0) {
+    return new Date(dateStr).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+  }
+
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);

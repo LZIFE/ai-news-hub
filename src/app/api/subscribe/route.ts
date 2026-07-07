@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 export async function POST(request: Request) {
   const { email } = await request.json();
 
-  if (!email || !email.includes('@')) {
+  if (!email || !EMAIL_REGEX.test(email)) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
   }
 
