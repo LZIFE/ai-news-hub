@@ -50,12 +50,14 @@ async function handleDigest() {
         'Content-Type': 'application/json',
         'X-Buttondown-Live-Dangerously': 'true',
       },
+      // body is a full HTML document; Buttondown renders it as HTML.
       body: JSON.stringify({
         subject,
         body,
         status: 'about_to_send',
         email_type: 'transactional',
       }),
+
     });
 
     if (!response.ok) {
