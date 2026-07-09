@@ -32,27 +32,28 @@ export const metadata: Metadata = {
   description: '精选来自最佳来源的人工智能新闻。每日更新 AI、机器学习和技术领域的最新资讯。',
   icons: {
     icon: '/icon.svg',
+    apple: '/apple-icon.svg',
   },
+  manifest: '/manifest.webmanifest',
   openGraph: {
     title: 'AI 新闻中心',
     description: '精选来自最佳来源的人工智能新闻。每日更新 AI、机器学习和技术领域的最新资讯。',
     type: 'website',
     locale: 'zh_CN',
+    images: '/og-image.svg',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI 新闻中心',
     description: '精选来自最佳来源的人工智能新闻。每日更新 AI、机器学习和技术领域的最新资讯。',
+    images: '/og-image.svg',
   },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FAFAF9' },
-    { media: '(prefers-color-scheme: dark)', color: '#0C0A09' },
-  ],
+  themeColor: '#E85D26',
 };
 
 export default function RootLayout({
