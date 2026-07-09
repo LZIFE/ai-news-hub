@@ -1,13 +1,12 @@
 import { fetchAllArticles } from '@/lib/fetcher';
 import { serialize } from '@/lib/serialize';
-import { DEFAULT_REVALIDATE } from '@/lib/rss-sources';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import SanitizedHTML from '@/components/SanitizedHTML';
 
-export const revalidate = DEFAULT_REVALIDATE;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

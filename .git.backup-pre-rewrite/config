@@ -1,0 +1,16 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "legacy-origin"]
+	url = https://github.com/readylin/ai-news-hub.git
+	fetch = +refs/heads/*:refs/remotes/legacy-origin/*
+[user]
+	name = LZIFE
+	email = LZIFE@users.noreply.github.com
+[remote "origin"]
+	url = https://github.com/LZIFE/ai-news-hub.git
+	fetch = +refs/heads/*:refs/remotes/origin/*

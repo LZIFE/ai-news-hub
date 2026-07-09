@@ -1,0 +1,18 @@
+fix: security hardening, fetcher dedup, paper filter, a11y/SEO
+
+- Security: auth on POST /api/cron/digest, /api/digest-now, /api/test-email
+- Security: narrow next/image remotePatterns from '**' to allowlist
+- Security: strict email regex on /api/subscribe
+- Fix: paper category filter now reads searchParams.category
+- Fix: translation preserves HTML structure (translateHtmlContent)
+- Fix: TTL cache clears on rejection (no more rejected-promise poisoning)
+- Fix: OpenAlex date now rolling 30d window instead of hardcoded 2026-06-01
+- Refactor: extract feed-utils.ts (makeId, dedupe, withTtlCache, sortByDate)
+- Refactor: extract digest.ts (buildDigest, filterLast24Hours) for 3 email routes
+- Perf: useBookmarks via useSyncExternalStore + cross-tab storage sync
+- Perf: useSearch uses Set for O(1) id lookup
+- A11y: form labels, skip-to-content link, #main landmark
+- SEO: add robots.ts + sitemap.ts
+- UX: mobile nav menu, router.push search, scrollbar-hide CSS, next/font
+- Chore: untrack .next/ and tsconfig.tsbuildinfo; remove unused deps (@react-email/render, resend)
+- Chore: reactStrictMode enabled

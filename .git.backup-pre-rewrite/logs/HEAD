@@ -1,0 +1,8 @@
+0000000000000000000000000000000000000000 f8eec7cab2ba43aba92210bd8aa278ab6ef9a5e2 Ready <z1@ReadyMacBook-Air.local> 1783222493 +0800	commit (initial): init: ai news hub
+f8eec7cab2ba43aba92210bd8aa278ab6ef9a5e2 5769e7e70dd5ad5b0cc5264539b0a3f70bedd578 Ready <z1@ReadyMacBook-Air.local> 1783222510 +0800	commit: init: ai news hub
+5769e7e70dd5ad5b0cc5264539b0a3f70bedd578 f4b1add8a322bfbabb96f6fa3e66b3d0d1a00e9d Ready <z1@ReadyMacBook-Air.local> 1783223478 +0800	commit: feat: 添加自动翻译系统，实现中英双语显示
+f4b1add8a322bfbabb96f6fa3e66b3d0d1a00e9d f4b1add8a322bfbabb96f6fa3e66b3d0d1a00e9d Ready <z1@ReadyMacBook-Air.local> 1783314155 +0800	reset: moving to HEAD
+f4b1add8a322bfbabb96f6fa3e66b3d0d1a00e9d 7edab78e2a41edf3df8127fc2b17d3b674174187 Ready <z1@ReadyMacBook-Air.local> 1783314161 +0800	commit: feat: add email automation with Buttondown API + Vercel cron
+7edab78e2a41edf3df8127fc2b17d3b674174187 9cfebce8d4cf438297496796cc5cfd0e9e635dd0 Ready <z1@ReadyMacBook-Air.local> 1783328670 +0800	commit: fix: unify logo sizes and update cron digest
+9cfebce8d4cf438297496796cc5cfd0e9e635dd0 575350177926aeab58d98a6b9dd1f0544b2fd7c8 Ready <z1@ReadyMacBook-Air.local> 1783406176 +0800	commit: chore: trigger deployment
+575350177926aeab58d98a6b9dd1f0544b2fd7c8 8a782ee27d4d43cc77ec9768eb94237d9041c49e LZIFE <LZIFE@users.noreply.github.com> 1783418852 +0800	commit: fix: security hardening, fetcher dedup, paper filter, a11y/SEO

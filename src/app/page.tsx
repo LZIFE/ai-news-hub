@@ -1,11 +1,10 @@
 import { fetchAllArticles } from '@/lib/fetcher';
 import { serialize } from '@/lib/serialize';
-import { DEFAULT_REVALIDATE } from '@/lib/rss-sources';
 import ArticleList from '@/components/ArticleList';
 import CategoryNav from '@/components/CategoryNav';
 import NewsletterCTA from '@/components/NewsletterCTA';
 
-export const revalidate = DEFAULT_REVALIDATE;
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const articles = serialize(await fetchAllArticles());
