@@ -27,12 +27,29 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
 }
 
+function isFresh(dateStr: string): boolean {
+  return Date.now() - new Date(dateStr).getTime() < 60 * 60 * 1000; // < 1 hour
+}
+
+// Rough estimate: Chinese text ~400 characters/min, Latin text ~200 words/min.
+function readingTime(text: string): number {
+  const cjkChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+  const latinWords = text.replace(/[\u4e00-\u9fff]/g, '').split(/\s+/).filter(Boolean).length;
+  const minutes = cjkChars / 400 + latinWords / 200;
+  return Math.max(1, Math.round(minutes));
+}
+
 export default function ArticleCard({ article, style, linkPrefix = '/articles/' }: { article: Article; style?: React.CSSProperties; linkPrefix?: string }) {
   const slug = article.id;
   const [imgError, setImgError] = useState(false);
+  const fresh = isFresh(article.publishedAt);
+  const mins = readingTime(article.contentZh || article.content || article.descriptionZh || article.description);
 
   return (
-    <article className="card group relative flex flex-col h-full animate-slide-up" style={{ animationFillMode: 'both', ...style }}>
+    <article className="card group relative flex flex-col h-full animate-slide-up overflow-hidden" style={{ animationFillMode: 'both', ...style }}>
+      {/* accent bar draws in from the left on hover — echoes a text cursor / reading progress */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-accent dark:bg-accent-dark scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
+
       {article.imageUrl && !imgError && (
         <Link href={`${linkPrefix}${slug}`} className="block mb-4 overflow-hidden rounded-lg">
           <div className="aspect-video bg-light-border dark:bg-dark-border relative">
@@ -41,28 +58,30 @@ export default function ArticleCard({ article, style, linkPrefix = '/articles/' 
               alt={article.title}
               width={600}
               height={338}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover grayscale-[35%] transition-all duration-500 ease-out group-hover:grayscale-0 group-hover:scale-[1.04]"
               loading="lazy"
               onError={() => setImgError(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         </Link>
       )}
 
-      <div className="flex items-center gap-2 text-xs text-light-muted dark:text-dark-muted mb-3">
-        <span className="flex items-center gap-1.5">
-          <span className="text-base">{article.sourceIcon}</span>
-          <span className="font-medium">{article.source}</span>
-        </span>
+      <div className="flex items-center gap-2 text-xs text-light-muted dark:text-dark-muted mb-3 flex-wrap">
+        {fresh && (
+          <span className="inline-flex items-center gap-1.5 text-accent dark:text-accent-dark font-medium">
+            <span className="cursor-mark" aria-hidden="true" />
+            最新
+          </span>
+        )}
+        <span className="flex items-center gap-1.5"><span className="text-base">{article.sourceIcon}</span><span className="font-medium">{article.source}</span></span>
         <span className="text-light-border dark:text-dark-border">·</span>
         <time className="font-mono text-[11px]">{timeAgo(article.publishedAt)}</time>
+        <span className="text-light-border dark:text-dark-border">·</span>
+        <span className="font-mono text-[11px]">{mins} 分钟阅读</span>
       </div>
 
       <Link href={`${linkPrefix}${slug}`} className="block flex-1">
-        <h2 className="font-display font-semibold text-[15px] leading-snug mb-1.5 group-hover:text-accent dark:group-hover:text-accent-dark transition-colors duration-200 line-clamp-2">
-          {article.titleZh || article.title}
-        </h2>
+        <h2 className="font-display font-semibold text-[16px] leading-snug mb-1.5 group-hover:text-accent dark:group-hover:text-accent-dark transition-colors duration-200 line-clamp-2">{article.titleZh || article.title}</h2>
         {article.titleZh && article.titleZh !== article.title && (
           <p className="text-xs text-light-muted dark:text-dark-muted line-clamp-1 mb-2 italic">
             {article.title}

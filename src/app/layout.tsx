@@ -1,22 +1,41 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Sans, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { Inter, Source_Serif_4, Noto_Sans_SC, Noto_Serif_SC, JetBrains_Mono } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import './globals.css';
 
-const dmSans = DM_Sans({
+// Body / UI — a clean grotesque for Latin, paired with a matching CJK sans
+// so Chinese UI text and Latin UI text sit at the same visual weight.
+const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
 });
 
-const spaceGrotesk = Space_Grotesk({
+const notoSansSC = Noto_Sans_SC({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
+  weight: ['400', '500', '700'],
+  variable: '--font-sans-zh',
+  display: 'swap',
+});
+
+// Display — an editorial serif. This is a news product: high-contrast serif
+// headlines are a functional choice rooted in that, not a decorative one.
+// Weights are limited to 600/700 to keep the CJK subset payload in check.
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  weight: ['600', '700'],
   variable: '--font-display',
+  display: 'swap',
+});
+
+const notoSerifSC = Noto_Serif_SC({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  variable: '--font-display-zh',
   display: 'swap',
 });
 
@@ -54,7 +73,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#E85D26',
+  themeColor: '#B54E2E',
 };
 
 export default function RootLayout({
@@ -63,7 +82,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning className={`${dmSans.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="zh-CN"
+      suppressHydrationWarning
+      className={`${inter.variable} ${notoSansSC.variable} ${sourceSerif.variable} ${notoSerifSC.variable} ${jetbrainsMono.variable}`}
+    >
       <body className="font-sans">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] btn-primary">

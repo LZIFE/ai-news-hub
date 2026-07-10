@@ -13,7 +13,7 @@ export default async function HomePage() {
     <div className="container-site py-10">
       <section className="mb-10 animate-fade-in">
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+          <span className="cursor-mark" aria-hidden="true" />
           <span className="section-label">每日更新</span>
         </div>
         <h1 className="font-display text-display-xl font-bold tracking-tight mb-3">
@@ -29,7 +29,7 @@ export default async function HomePage() {
       </section>
 
       <section className="mb-16">
-        <ArticleList articles={articles} />
+        <ArticleList articles={articles} showFeatured />
       </section>
 
       <NewsletterCTA />

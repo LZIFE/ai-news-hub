@@ -27,8 +27,8 @@
   }
 
   .card {
-    @apply bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-card p-5 transition-all duration-200 h-full;
-    @apply hover:shadow-card-hover hover:-translate-y-0.5;
+    @apply bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-card p-5 transition-all duration-300 ease-out h-full;
+    @apply hover:shadow-card-hover hover:-translate-y-1 hover:border-accent/25 dark:hover:border-accent-dark/25;
   }
 
   .badge {
@@ -51,6 +51,13 @@
 
   .section-label {
     @apply text-xs font-mono font-medium tracking-wider uppercase text-light-muted dark:text-dark-muted;
+  }
+
+  /* Signature motif: a blinking text-cursor, reserved exclusively for "this is
+     live / updating" signals (hero eyebrow, freshly-published article tags).
+     It should never appear as pure decoration — only where it means something. */
+  .cursor-mark {
+    @apply inline-block w-[2px] h-[0.9em] bg-accent dark:bg-accent-dark align-middle animate-blink;
   }
 
   .prose {
